@@ -27,10 +27,10 @@ PKG_CONFIG_DEPENDS += \
 sanitize = $(call tolower,$(subst _,-,$(subst $(space),-,$(1))))
 
 VERSION_NUMBER:=$(call qstrip,$(CONFIG_VERSION_NUMBER))
-VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),SNAPSHOT)
+VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),R6220)
 
 VERSION_CODE:=$(call qstrip,$(CONFIG_VERSION_CODE))
-VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),$(REVISION))
+VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),250213)
 
 VERSION_REPO:=$(call qstrip,$(CONFIG_VERSION_REPO))
 VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://downloads.openwrt.org/snapshots)
@@ -73,7 +73,6 @@ endef
 
 VERSION_TAINT_SPECS := \
 	-ALL_KMODS:no-all \
-	-IPV6:no-ipv6 \
 	+USE_GLIBC:glibc \
 	+USE_MKLIBS:mklibs \
 	+BUSYBOX_CUSTOM:busybox \
