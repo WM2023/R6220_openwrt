@@ -308,7 +308,7 @@
         compatible = "mediatek,mt7621-eth";
         reg = <0x1e100000 0xe000>;
         clocks = <&sysc MT7621_CLK_FE &sysc MT7621_CLK_ETH>;
-        clock-names = "fe", "ethif";
+        clock-names = "fe", "eth";
 
         #address-cells = <1>;
         #size-cells = <0>;
