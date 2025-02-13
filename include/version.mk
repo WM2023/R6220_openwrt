@@ -73,6 +73,7 @@ endef
 
 VERSION_TAINT_SPECS := \
 	-ALL_KMODS:no-all \
+	-IPV6:ipv6 \
 	+USE_GLIBC:glibc \
 	+USE_MKLIBS:mklibs \
 	+BUSYBOX_CUSTOM:busybox \
