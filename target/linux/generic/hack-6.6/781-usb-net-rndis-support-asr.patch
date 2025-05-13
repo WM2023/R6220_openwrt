@@ -13,7 +13,7 @@ Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
 --- a/drivers/net/usb/rndis_host.c
 +++ b/drivers/net/usb/rndis_host.c
-@@ -640,6 +640,16 @@ static const struct driver_info	wwan_rnd
+@@ -630,6 +630,16 @@ static const struct driver_info	zte_rndis
  	.tx_fixup =	rndis_tx_fixup,
  };
  
