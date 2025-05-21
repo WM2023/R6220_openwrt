@@ -13,7 +13,7 @@ Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
 --- a/drivers/net/usb/rndis_host.c
 +++ b/drivers/net/usb/rndis_host.c
-@@ -630,6 +630,16 @@ static const struct driver_info	zte_rndis
+@@ -630,6 +630,16 @@ static const struct driver_info	zte_rndi
  	.tx_fixup =	rndis_tx_fixup,
  };
  
@@ -65,5 +65,5 @@ Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 +	.driver_info = (unsigned long) &asr_rndis_info,
 +}, {
  	/* Novatel Verizon USB730L */
-	USB_INTERFACE_INFO(USB_CLASS_MISC, 4, 1),
-	.driver_info = (unsigned long) &rndis_info,
+ 	USB_INTERFACE_INFO(USB_CLASS_MISC, 4, 1),
+ 	.driver_info = (unsigned long) &rndis_info,
