@@ -52,6 +52,24 @@ define Build/mt798x-gpt
 	rm $@.tmp
 endef
 
+# Variation of the normal partition table to account
+# for factory and mfgdata partition
+#
+# Keep fip partition at standard offset to keep consistency
+# with uboot commands
+define Build/mt7988-mozart-gpt
+	cp $@ $@.tmp 2>/dev/null || true
+	ptgen -g -o $@.tmp -a 1 -l 1024 \
+			-t 0x83	-N ubootenv	-r	-p 512k@4M \
+			-t 0xef	-N fip		  -r	-p 4M@6656k \
+			-t 0x83	-N factory	-r	-p 8M@25M \
+			-t 0x2e	-N mfgdata	-r	-p 8M@33M \
+			-t 0xef -N recovery	-r	-p 32M@41M \
+			-t 0x2e -N production		-p $(CONFIG_TARGET_ROOTFS_PARTSIZE)M@73M
+	cat $@.tmp >> $@
+	rm $@.tmp
+endef
+
 define Build/append-openwrt-one-eeprom
 	dd if=$(STAGING_DIR_IMAGE)/mt7981_eeprom_mt7976_dbdc.bin >> $@
 endef
@@ -244,7 +262,7 @@ define Device/arcadyan_mozart
   IMAGES := sysupgrade.itb
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
   ARTIFACTS := emmc-preloader.bin emmc-bl31-uboot.fip emmc-gpt.bin
-  ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
+  ARTIFACT/emmc-gpt.bin := mt7988-mozart-gpt
   ARTIFACT/emmc-preloader.bin	:= mt7988-bl2 emmc-comb
   ARTIFACT/emmc-bl31-uboot.fip	:= mt7988-bl31-uboot arcadyan_mozart
   SUPPORTED_DEVICES += arcadyan,mozart
@@ -761,6 +779,31 @@ define Device/cudy_tr3000-v1
 endef
 TARGET_DEVICES += cudy_tr3000-v1
 
+define Device/cudy_tr3000-v1-ubootmod
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := TR3000
+  DEVICE_VARIANT := v1 (OpenWrt U-Boot layout)
+  DEVICE_DTS := mt7981b-cudy-tr3000-v1-ubootmod
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  UBOOTENV_IN_UBI := 1
+  IMAGES := sysupgrade.itb
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/preloader.bin := mt7981-bl2 cudy-tr3000-v1
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot cudy_tr3000-v1
+endef
+TARGET_DEVICES += cudy_tr3000-v1-ubootmod
+
 define Device/cudy_wr3000-v1
   DEVICE_VENDOR := Cudy
   DEVICE_MODEL := WR3000
@@ -779,6 +822,23 @@ define Device/cudy_wr3000-v1
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
 endef
 TARGET_DEVICES += cudy_wr3000-v1
+
+define Device/cudy_wr3000e-v1
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := WR3000E
+  DEVICE_VARIANT := v1
+  DEVICE_DTS := mt7981b-cudy-wr3000e-v1
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES += R53
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+endef
+TARGET_DEVICES += cudy_wr3000e-v1
 
 define Device/cudy_wr3000s-v1
   DEVICE_VENDOR := Cudy
@@ -884,15 +944,30 @@ TARGET_DEVICES += gatonetworks_gdsp
 define Device/glinet_gl-mt2500
   DEVICE_VENDOR := GL.iNet
   DEVICE_MODEL := GL-MT2500
-  DEVICE_DTS := mt7981b-glinet-gl-mt2500
+  DEVICE_VARIANT := MaxLinear PHY
+  DEVICE_DTS := mt7981b-glinet-gl-mt2500-v1
   DEVICE_DTS_DIR := ../dts
   DEVICE_DTS_LOADADDR := 0x47000000
   DEVICE_PACKAGES := -wpad-basic-mbedtls e2fsprogs f2fsck mkf2fs kmod-usb3
-  SUPPORTED_DEVICES += glinet,mt2500-emmc
+  SUPPORTED_DEVICES += glinet,mt2500-emmc glinet,gl-mt2500-airoha
   IMAGES := sysupgrade.bin
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
 endef
 TARGET_DEVICES += glinet_gl-mt2500
+
+define Device/glinet_gl-mt2500-airoha
+  DEVICE_VENDOR := GL.iNet
+  DEVICE_MODEL := GL-MT2500
+  DEVICE_VARIANT := Airoha PHY
+  DEVICE_DTS := mt7981b-glinet-gl-mt2500-v2
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTS_LOADADDR := 0x47000000
+  DEVICE_PACKAGES := -wpad-basic-mbedtls e2fsprogs f2fsck mkf2fs kmod-usb3 kmod-phy-airoha-en8811h airoha-en8811h-firmware
+  SUPPORTED_DEVICES += glinet,mt2500-emmc glinet,gl-mt2500
+  IMAGES := sysupgrade.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
+endef
+TARGET_DEVICES += glinet_gl-mt2500-airoha
 
 define Device/glinet_gl-mt3000
   DEVICE_VENDOR := GL.iNet
@@ -1626,6 +1701,20 @@ define Device/tenbay_wr3000k
         fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
 endef
 TARGET_DEVICES += tenbay_wr3000k
+
+define Device/tplink_archer-ax80-v1
+  DEVICE_VENDOR := TP-Link
+  DEVICE_MODEL := Archer AX80V1
+  DEVICE_DTS := mt7986a-tplink-archer-ax80-v1
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-leds-lp5523 kmod-usb3 kmod-mt7915e kmod-mt7986-firmware mt7986-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 51200k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += tplink_archer-ax80-v1
 
 define Device/tplink_re6000xd
   DEVICE_VENDOR := TP-Link
