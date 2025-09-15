@@ -223,6 +223,13 @@
 			"type": "alias",
 			"default": "disabled"
 		},
+		"device": {
+			"description": "Devices to enable this interface on (wifi-device section names)",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
 		"device_name": {
 			"description": "Primary Device Name used by WPS",
 			"type": "string",
@@ -286,8 +293,10 @@
 			"type": "boolean"
 		},
 		"dynamic_vlan": {
-			"description": "Allow RADIUS authentication server to decide which VLAN is used for the stations",
-			"type": "boolean"
+			"description": "Allow RADIUS authentication server to decide which VLAN is used for the stations (0 = disabled, 1 = optional, 2 = required)",
+			"type": "number",
+			"enum": [ 0, 1, 2 ],
+			"default": 0
 		},
 		"eap_reauth_period": {
 			"description": "EAP reauthentication period in seconds",
@@ -380,13 +389,6 @@
 			"description": "Deauthentication request timeout",
 			"type": "number",
 			"default": 60
-		},
-		"hs20_oper_friendly_name": {
-			"description": "Operator Friendly Name",
-			"type": "array",
-			"items": {
-				"type": "string"
-			}
 		},
 		"hs20_operating_class": {
 			"description": "Operating Class Indication",
@@ -749,23 +751,6 @@
 			"description": "PMKSA and Opportunistic Key Caching",
 			"type": "boolean"
 		},
-		"operator_icon": {
-			"type": "array"
-		},
-		"osen": {
-			"description": "OSU Server-Only Authenticated L2 Encryption Network",
-			"type": "boolean",
-			"default": false
-		},
-		"osu_provider": {
-			"type": "array",
-			"items": {
-				"type": "string"
-			}
-		},
-		"osu_ssid": {
-			"type": "string"
-		},
 		"owe_transition": {
 			"description": "Indicate that an OWE BSS shall automatically add an unencrypted transition interface",
 			"type": "boolean"
@@ -861,6 +846,12 @@
 		},
 		"r1kh": {
 			"description": "List of R1KHs in the same Mobility Domain",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"radios": {
 			"type": "array",
 			"items": {
 				"type": "string"
