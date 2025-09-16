@@ -43,16 +43,14 @@
         regulator-always-on;
         regulator-max-microvolt = <3300000>;
         regulator-min-microvolt = <3300000>;
-        enable-active-high;
     };
 
     reg_vqmmc: regulator-vqmmc {
         compatible = "regulator-fixed";
         regulator-name = "mmc_io";
         regulator-always-on;
-        regulator-max-microvolt = <1800000>;
-        regulator-min-microvolt = <1800000>;
-        enable-active-high;
+        regulator-max-microvolt = <3300000>;
+        regulator-min-microvolt = <3300000>;
     };
 
     reg_vbus: regulator-vbus {
@@ -412,6 +410,8 @@
 					ethphy4: ethernet-phy@4 {
 						reg = <4>;
 						interrupts = <4>;
+						eee-broken-100tx;
+						eee-broken-1000t;
 					};
 				};
 
