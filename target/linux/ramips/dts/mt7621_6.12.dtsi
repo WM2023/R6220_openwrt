@@ -37,22 +37,38 @@
         #interrupt-cells = <1>;
     };
 
-    mmc_fixed_3v3: regulator-3v3 {
+    reg_vmmc: regulator-vmmc {
         compatible = "regulator-fixed";
         regulator-name = "mmc_power";
-        regulator-min-microvolt = <3300000>;
-        regulator-max-microvolt = <3300000>;
-        enable-active-high;
         regulator-always-on;
+        regulator-max-microvolt = <3300000>;
+        regulator-min-microvolt = <3300000>;
+        enable-active-high;
     };
 
-    mmc_fixed_1v8_io: regulator-1v8 {
+    reg_vqmmc: regulator-vqmmc {
         compatible = "regulator-fixed";
         regulator-name = "mmc_io";
-        regulator-min-microvolt = <1800000>;
-        regulator-max-microvolt = <1800000>;
-        enable-active-high;
         regulator-always-on;
+        regulator-max-microvolt = <1800000>;
+        regulator-min-microvolt = <1800000>;
+        enable-active-high;
+    };
+
+    reg_vbus: regulator-vbus {
+        compatible = "regulator-fixed";
+        regulator-name = "usb_power";
+        regulator-always-on;
+        regulator-max-microvolt = <5000000>;
+        regulator-min-microvolt = <5000000>;
+    };
+
+    reg_vusb33: regulator-vusb33 {
+        compatible = "regulator-fixed";
+        regulator-name = "usb_io";
+        regulator-always-on;
+        regulator-max-microvolt = <3300000>;
+        regulator-min-microvolt = <3300000>;
     };
 
     palmbus: bus@1e000000 {
@@ -424,8 +440,8 @@
         max-frequency = <48000000>;
         cap-sd-highspeed;
         cap-mmc-highspeed;
-        vmmc-supply = <&mmc_fixed_3v3>;
-        vqmmc-supply = <&mmc_fixed_1v8_io>;
+        vmmc-supply = <&reg_vmmc>;
+        vqmmc-supply = <&reg_vqmmc>;
         disable-wp;
 
         pinctrl-names = "default", "state_uhs";
@@ -536,6 +552,9 @@
 
         interrupt-parent = <&gic>;
         interrupts = <GIC_SHARED 22 IRQ_TYPE_LEVEL_HIGH>;
+
+		vbus-supply = <&reg_vbus>;
+		vusb33-supply = <&reg_vusb33>;
 
         #address-cells = <1>;
         #size-cells = <0>;
