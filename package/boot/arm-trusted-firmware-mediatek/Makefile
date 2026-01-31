@@ -440,6 +440,14 @@ define Trusted-Firmware-A/mt7987-sdmmc-ddr4-4bg
   DDR4_4BG_MODE:=1
 endef
 
+define Trusted-Firmware-A/mt7987-spim-nand0
+  NAME:=MediaTek MT7987 (SPI-NAND via SPIM)
+  BOOT_DEVICE:=spim-nand
+  BUILD_SUBTARGET:=filogic
+  PLAT:=mt7987
+  SPIM_CTRL:=0
+endef
+
 define Trusted-Firmware-A/mt7987-spim-nand0-ubi-comb
   NAME:=MediaTek MT7987 (SPI-NAND via SPIM, UBI)
   BOOT_DEVICE:=spim-nand
@@ -637,6 +645,34 @@ define Trusted-Firmware-A/mt7988-spim-nand-ubi-ddr4
   USE_UBI:=1
 endef
 
+define Trusted-Firmware-A/mt7988-emmc-comb-4bg
+  NAME:=MediaTek MT7988 (eMMC, DDR4 8GB)
+  BOOT_DEVICE:=emmc
+  BUILD_SUBTARGET:=filogic
+  PLAT:=mt7988
+  DRAM_USE_COMB:=1
+  DDR4_4BG_MODE:=1
+endef
+
+define Trusted-Firmware-A/mt7988-sdmmc-comb-4bg
+  NAME:=MediaTek MT7988 (SD card, DDR4 8GB)
+  BOOT_DEVICE:=sdmmc
+  BUILD_SUBTARGET:=filogic
+  PLAT:=mt7988
+  DRAM_USE_COMB:=1
+  DDR4_4BG_MODE:=1
+endef
+
+define Trusted-Firmware-A/mt7988-spim-nand-ubi-comb-4bg
+  NAME:=MediaTek MT7988 (SPI-NAND via SPIM, UBI, DDR4 8GB)
+  BOOT_DEVICE:=spim-nand
+  BUILD_SUBTARGET:=filogic
+  PLAT:=mt7988
+  DRAM_USE_COMB:=1
+  DDR4_4BG_MODE:=1
+  USE_UBI:=1
+endef
+
 TFA_TARGETS:= \
 	mt7622-nor-1ddr \
 	mt7622-nor-2ddr \
@@ -685,6 +721,7 @@ TFA_TARGETS:= \
 	mt7987-nor-comb \
 	mt7987-sdmmc-comb \
 	mt7987-sdmmc-ddr4-4bg \
+	mt7987-spim-nand0 \
 	mt7987-spim-nand0-ubi-comb \
 	mt7987-spim-nand2-ubi-comb \
 	mt7987-ram-comb \
@@ -707,7 +744,10 @@ TFA_TARGETS:= \
 	mt7988-snand-ubi-comb \
 	mt7988-spim-nand-comb \
 	mt7988-spim-nand-ubi-comb \
-	mt7988-spim-nand-ubi-ddr4
+	mt7988-spim-nand-ubi-ddr4 \
+	mt7988-emmc-comb-4bg \
+	mt7988-sdmmc-comb-4bg \
+	mt7988-spim-nand-ubi-comb-4bg
 
 TFA_MAKE_FLAGS += \
 	BOOT_DEVICE=$(BOOT_DEVICE) \
