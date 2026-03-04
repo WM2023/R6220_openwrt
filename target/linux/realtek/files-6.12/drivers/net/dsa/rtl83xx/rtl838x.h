@@ -3,6 +3,7 @@
 #ifndef _RTL838X_H
 #define _RTL838X_H
 
+#include <asm/mach-rtl-otto/mach-rtl-otto.h>
 #include <net/dsa.h>
 
 /* Register definition */
@@ -45,27 +46,72 @@
 /* VLAN registers */
 #define RTL838X_VLAN_CTRL			(0x3A74)
 #define RTL838X_VLAN_PROFILE(idx)		(0x3A88 + ((idx) << 2))
+#define RTL838X_VLAN_PROFILE_MAX		7
 #define RTL838X_VLAN_PORT_EGR_FLTR		(0x3A84)
 #define RTL838X_VLAN_PORT_PB_VLAN		(0x3C00)
 #define RTL838X_VLAN_PORT_IGR_FLTR		(0x3A7C)
 
+#define RTL838X_VLAN_L2_LEARN_EN(i)		(i)
+#define RTL838X_VLAN_L2_UNKN_MC_FLD(pmsk)	(pmsk << 1)
+#define RTL838X_VLAN_IP4_UNKN_MC_FLD(pmsk)	(pmsk << 10)
+#define RTL838X_VLAN_IP6_UNKN_MC_FLD(pmsk)	(pmsk << 19)
+
+#define RTL838X_VLAN_L2_LEARN_EN_R(p)		(p & RTL838X_VLAN_L2_LEARN_EN(1))
+#define RTL838X_VLAN_L2_UNKN_MC_FLD_PMSK(p)	((p >> 1) & (MAX_MC_PMASKS - 1))
+#define RTL838X_VLAN_IP4_UNKN_MC_FLD_PMSK(p)	((p >> 10) & (MAX_MC_PMASKS - 1))
+#define RTL838X_VLAN_IP6_UNKN_MC_FLD_PMSK(p)	((p >> 19) & (MAX_MC_PMASKS - 1))
+
 #define RTL839X_VLAN_PROFILE(idx)		(0x25C0 + (((idx) << 3)))
+#define RTL839X_VLAN_PROFILE_MAX		7
 #define RTL839X_VLAN_CTRL			(0x26D4)
 #define RTL839X_VLAN_PORT_PB_VLAN		(0x26D8)
 #define RTL839X_VLAN_PORT_IGR_FLTR		(0x27B4)
 #define RTL839X_VLAN_PORT_EGR_FLTR		(0x27C4)
 
+#define RTL839X_VLAN_L2_LEARN_EN(i)		(i)
+#define RTL839X_VLAN_L2_UNKN_MC_FLD(pmsk)	(pmsk << 1)
+#define RTL839X_VLAN_IP4_UNKN_MC_FLD(pmsk)	(pmsk << 13)
+#define RTL839X_VLAN_IP6_UNKN_MC_FLD(pmsk)	(pmsk)
+
+#define RTL839X_VLAN_L2_LEARN_EN_R(p)		(p[1] & RTL839X_VLAN_L2_LEARN_EN(1))
+#define RTL839X_VLAN_L2_UNKN_MC_FLD_PMSK(p)	((p[1] >> 1) & (MAX_MC_PMASKS - 1))
+#define RTL839X_VLAN_IP4_UNKN_MC_FLD_PMSK(p)	((p[1] >> 13) & (MAX_MC_PMASKS - 1))
+#define RTL839X_VLAN_IP6_UNKN_MC_FLD_PMSK(p)	((p[0]) & (MAX_MC_PMASKS - 1))
+
 #define RTL930X_VLAN_PROFILE_SET(idx)		(0x9c60 + (((idx) * 20)))
+#define RTL930X_VLAN_PROFILE_MAX		7
 #define RTL930X_VLAN_CTRL			(0x82D4)
 #define RTL930X_VLAN_PORT_PB_VLAN		(0x82D8)
 #define RTL930X_VLAN_PORT_IGR_FLTR		(0x83C0)
 #define RTL930X_VLAN_PORT_EGR_FLTR		(0x83C8)
 
+#define RTL930X_VLAN_L2_UNKN_MC_FLD(pmsk)	(pmsk)
+#define RTL930X_VLAN_IP4_UNKN_MC_FLD(pmsk)	(pmsk)
+#define RTL930X_VLAN_IP6_UNKN_MC_FLD(pmsk)	(pmsk)
+
+#define RTL930X_VLAN_L2_LEARN_EN_R(p)		(p[0] & (3 << 21))
+#define RTL930X_VLAN_L2_UNKN_MC_FLD_PMSK(p)	(p[2] & RTL930X_MC_PMASK_ALL_PORTS)
+#define RTL930X_VLAN_IP4_UNKN_MC_FLD_PMSK(p)	(p[3] & RTL930X_MC_PMASK_ALL_PORTS)
+#define RTL930X_VLAN_IP6_UNKN_MC_FLD_PMSK(p)	(p[4] & RTL930X_MC_PMASK_ALL_PORTS)
+
 #define RTL931X_VLAN_PROFILE_SET(idx)		(0x9800 + (((idx) * 28)))
+#define RTL931X_VLAN_PROFILE_MAX		15
 #define RTL931X_VLAN_CTRL			(0x94E4)
 #define RTL931X_VLAN_PORT_IGR_CTRL		(0x94E8)
 #define RTL931X_VLAN_PORT_IGR_FLTR		(0x96B4)
 #define RTL931X_VLAN_PORT_EGR_FLTR		(0x96C4)
+
+#define RTL931X_VLAN_L2_UNKN_MC_FLD_H(pmsk)	(((u64)pmsk) >> 32)
+#define RTL931X_VLAN_L2_UNKN_MC_FLD_L(pmsk)	(pmsk & GENMASK_ULL(31, 0))
+#define RTL931X_VLAN_IP4_UNKN_MC_FLD_H(pmsk)	(((u64)pmsk) >> 32)
+#define RTL931X_VLAN_IP4_UNKN_MC_FLD_L(pmsk)	(pmsk & GENMASK_ULL(31, 0))
+#define RTL931X_VLAN_IP6_UNKN_MC_FLD_H(pmsk)	(((u64)pmsk) >> 32)
+#define RTL931X_VLAN_IP6_UNKN_MC_FLD_L(pmsk)	(pmsk & GENMASK_ULL(31, 0))
+
+#define RTL931X_VLAN_L2_LEARN_EN_R(p)		(p[0] & (3 << 14))
+#define RTL931X_VLAN_L2_UNKN_MC_FLD_PMSK(p)	((((u64)p[1]) << 32 | p[2]) & RTL931X_MC_PMASK_ALL_PORTS)
+#define RTL931X_VLAN_IP4_UNKN_MC_FLD_PMSK(p)	((((u64)p[3]) << 32 | p[4]) & RTL931X_MC_PMASK_ALL_PORTS)
+#define RTL931X_VLAN_IP6_UNKN_MC_FLD_PMSK(p)	((((u64)p[5]) << 32 | p[6]) & RTL931X_MC_PMASK_ALL_PORTS)
 
 /* Table access registers */
 #define RTL838X_TBL_ACCESS_CTRL_0		(0x6914)
@@ -206,6 +252,11 @@
 
 #define RTL930X_L2_UNKN_UC_FLD_PMSK		(0x9064)
 #define RTL931X_L2_UNKN_UC_FLD_PMSK		(0xC8F4)
+
+#define RTL838X_L2_BC_FLD(pmsk)			(pmsk << 9)
+#define RTL838X_L2_UNKN_UC_FLD(pmsk)		(pmsk)
+#define RTL839X_L2_BC_FLD(pmsk)			(pmsk << 12)
+#define RTL839X_L2_UNKN_UC_FLD(pmsk)		(pmsk)
 
 #define RTL838X_L2_LRN_CONSTRT_EN		(0x3368)
 #define RTL838X_L2_PORT_LRN_CONSTRT		(0x32A0)
@@ -701,8 +752,20 @@ typedef enum {
 #define MAX_LAGS 16
 #define MAX_PRIOS 8
 #define RTL930X_PORT_IGNORE 0x3f
+/* ToDo: MAX_MC_GROUPS could be increased
+ * 838x/839x/930x/931x -> 8192/16384/16384/32768 entries (priv->fib_entries)
+ * They are shared with unicast entries
+ */
 #define MAX_MC_GROUPS 512
-#define UNKNOWN_MC_PMASK (MAX_MC_GROUPS - 1)
+/* ToDo: MAX_MC_PMASKS could be increased
+ * 838x/839x/930x/931x -> 512/4096/1024/4096 entries
+ */
+#define MAX_MC_PMASKS 512
+#define RTL838X_MC_PMASK_ALL_PORTS (GENMASK(RTL838X_CPU_PORT, 0))
+#define RTL839X_MC_PMASK_ALL_PORTS (GENMASK_ULL(RTL839X_CPU_PORT, 0))
+#define RTL930X_MC_PMASK_ALL_PORTS (GENMASK(RTL930X_CPU_PORT, 0))
+#define RTL931X_MC_PMASK_ALL_PORTS (GENMASK_ULL(RTL931X_CPU_PORT, 0))
+#define MC_PMASK_ALL_PORTS_IDX	((MAX_MC_PMASKS - 1))
 #define PIE_BLOCK_SIZE 128
 #define MAX_PIE_ENTRIES (18 * PIE_BLOCK_SIZE)
 #define N_FIXED_FIELDS 12
@@ -849,6 +912,26 @@ struct rtldsa_mst {
 
 	/** @refcount: number of vlans currently using this msti, undefined when unused */
 	struct kref refcount;
+};
+
+struct rtldsa_vlan_profile {
+	union {
+		struct {
+			u64 l2;
+			u64 ip;
+			u64 ip6;
+		} pmsks;
+		struct {
+			u16 l2;
+			u16 ip;
+			u16 ip6;
+		} pmsks_idx;
+	} unkn_mc_fld;
+
+	int l2_learn;
+
+	u8 pmsk_is_idx:1, routing_ipuc:1, routing_ip6uc:1,
+	   routing_ipmc:1, routing_ip6mc:1, bridge_ipmc:1, bridge_ip6mc:1;
 };
 
 enum l2_entry_type {
@@ -1168,7 +1251,7 @@ struct rtldsa_mirror_config {
 	u32 val;
 };
 
-struct rtl838x_reg {
+struct rtldsa_config {
 	void (*mask_port_reg_be)(u64 clear, u64 set, int reg);
 	void (*set_port_reg_be)(u64 set, int reg);
 	u64 (*get_port_reg_be)(int reg);
@@ -1179,6 +1262,7 @@ struct rtl838x_reg {
 	int stat_rst;
 	int stat_port_std_mib;
 	int stat_port_prv_mib;
+	const struct rtldsa_mib_desc *mib_desc;
 	u64 (*stat_port_table_read)(int port, unsigned int mib_size, unsigned int offset, bool is_pvt);
 	void (*stat_counters_lock)(struct rtl838x_switch_priv *priv, int port);
 	void (*stat_counters_unlock)(struct rtl838x_switch_priv *priv, int port);
@@ -1210,15 +1294,19 @@ struct rtl838x_reg {
 	int isr_port_link_sts_chg;
 	int imr_port_link_sts_chg;
 	int imr_glb;
+	int n_counters;
+	int n_pie_blocks;
+	u8 port_ignore;
 	void (*vlan_tables_read)(u32 vlan, struct rtl838x_vlan_info *info);
 	void (*vlan_set_tagged)(u32 vlan, struct rtl838x_vlan_info *info);
 	void (*vlan_set_untagged)(u32 vlan, u64 portmask);
-	void (*vlan_profile_dump)(int index);
+	int (*vlan_profile_get)(int index, struct rtldsa_vlan_profile *profile);
+	void (*vlan_profile_dump)(struct rtl838x_switch_priv *priv, int index);
 	void (*vlan_profile_setup)(int profile);
 	void (*vlan_port_pvidmode_set)(int port, enum pbvlan_type type, enum pbvlan_mode mode);
 	void (*vlan_port_pvid_set)(int port, enum pbvlan_type type, int pvid);
 	void (*vlan_port_keep_tag_set)(int port, bool keep_outer, bool keep_inner);
-	int (*vlan_port_fast_age)(struct rtl838x_switch_priv *priv, int port, u16 vid);
+	int (*fast_age)(struct rtl838x_switch_priv *priv, int port, int vid);
 	void (*set_vlan_igr_filter)(int port, enum igr_filter state);
 	void (*set_vlan_egr_filter)(int port, enum egr_filter state);
 	void (*enable_learning)(int port, bool enable);
@@ -1238,6 +1326,7 @@ struct rtl838x_reg {
 				    const struct flow_action_entry *act, bool ingress);
 	int (*port_rate_police_del)(struct dsa_switch *ds, int port, struct flow_cls_offload *cls,
 				    bool ingress);
+	void (*print_matrix)(void);
 	u64 (*read_l2_entry_using_hash)(u32 hash, u32 position, struct rtl838x_l2_entry *e);
 	void (*write_l2_entry_using_hash)(u32 hash, u32 pos, struct rtl838x_l2_entry *e);
 	u64 (*read_cam)(int idx, struct rtl838x_l2_entry *e);
@@ -1292,11 +1381,10 @@ struct rtl838x_switch_priv {
 	int link_state_irq;
 	int mirror_group_ports[4];
 	struct mii_bus *parent_bus;
-	const struct rtl838x_reg *r;
+	const struct rtldsa_config *r;
 	u8 cpu_port;
 	u8 port_mask;
 	u8 port_width;
-	u8 port_ignore;
 	u64 irq_mask;
 	u32 fib_entries;
 	int l2_bucket_size;
@@ -1324,10 +1412,8 @@ struct rtl838x_switch_priv {
 	struct notifier_block fib_nb;
 	bool eee_enabled;
 	unsigned long mc_group_bm[MAX_MC_GROUPS >> 5];
-	int n_pie_blocks;
 	struct rhashtable tc_ht;
 	unsigned long pie_use_bm[MAX_PIE_ENTRIES >> 5];
-	int n_counters;
 	unsigned long octet_cntr_use_bm[MAX_COUNTERS >> 5];
 	unsigned long packet_cntr_use_bm[MAX_COUNTERS >> 4];
 	struct rhltable routes;
