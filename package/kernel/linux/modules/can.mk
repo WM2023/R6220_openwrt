@@ -15,13 +15,10 @@ define KernelPackage/can
 	CONFIG_CAN_DEV \
 	CONFIG_CAN_NETLINK=y \
 	CONFIG_CAN_CALC_BITTIMING=y \
-	CONFIG_CAN_LEDS=y \
 	CONFIG_CAN_AT91=n \
 	CONFIG_CAN_TI_HECC=n \
 	CONFIG_CAN_MCP251X=n \
-	CONFIG_CAN_BFIN=n \
 	CONFIG_CAN_JANZ_ICAN3=n \
-	CONFIG_PCH_CAN=n \
 	CONFIG_CAN_GRCAN=n \
 	CONFIG_CAN_CC770=n \
 	CONFIG_CAN_MSCAN=n \
@@ -233,7 +230,7 @@ define KernelPackage/can-usb-esd
   TITLE:=ESD USB/2 CAN/USB interface
   KCONFIG:=CONFIG_CAN_ESD_USB
   FILES:=$(LINUX_DIR)/drivers/net/can/usb/esd_usb.ko
-  AUTOLOAD:=$(call AutoProbe,esd_usb2 esd_usb)
+  AUTOLOAD:=$(call AutoProbe,esd_usb)
   $(call AddDepends/can,+kmod-usb-core)
 endef
 

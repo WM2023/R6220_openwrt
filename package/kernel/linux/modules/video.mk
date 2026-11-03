@@ -64,15 +64,11 @@ define KernelPackage/backlight
 	DEPENDS:=video-support
 	HIDDEN:=1
 	KCONFIG:=CONFIG_BACKLIGHT_CLASS_DEVICE \
-		CONFIG_BACKLIGHT_LCD_SUPPORT=y \
 		CONFIG_LCD_CLASS_DEVICE=n \
-		CONFIG_BACKLIGHT_GENERIC=n \
 		CONFIG_BACKLIGHT_ADP8860=n \
-		CONFIG_BACKLIGHT_ADP8870=n \
-		CONFIG_BACKLIGHT_OT200=n \
-		CONFIG_BACKLIGHT_PM8941_WLED=n
+		CONFIG_BACKLIGHT_ADP8870=n
 	FILES:=$(LINUX_DIR)/drivers/video/backlight/backlight.ko
-	AUTOLOAD:=$(call AutoProbe,video backlight)
+	AUTOLOAD:=$(call AutoProbe,backlight)
 endef
 
 define KernelPackage/backlight/description
@@ -102,7 +98,7 @@ define KernelPackage/backlight-pwm
 	DEPENDS:=@PWM_SUPPORT +kmod-backlight
 	KCONFIG:=CONFIG_BACKLIGHT_PWM
 	FILES:=$(LINUX_DIR)/drivers/video/backlight/pwm_bl.ko
-	AUTOLOAD:=$(call AutoProbe,video pwm_bl,1)
+	AUTOLOAD:=$(call AutoProbe,pwm_bl,1)
 endef
 
 define KernelPackage/backlight-pwm/description
@@ -119,7 +115,6 @@ define KernelPackage/fb
   KCONFIG:= \
 	CONFIG_FB \
 	CONFIG_FB_DEVICE=y \
-	CONFIG_FB_MXS=n \
 	CONFIG_FB_SM750=n \
 	CONFIG_FRAMEBUFFER_CONSOLE=y \
 	CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y \
@@ -299,7 +294,6 @@ define KernelPackage/cec-core
   TITLE:=CEC framework
   HIDDEN:=1
   KCONFIG:=CONFIG_CEC_CORE
-  DEPENDS:=@LINUX_6_18
   FILES:=$(LINUX_DIR)/drivers/media/cec/core/cec.ko
   AUTOLOAD:=$(call AutoProbe,cec)
 endef
@@ -349,7 +343,7 @@ $(eval $(call KernelPackage,drm-buddy))
 define KernelPackage/drm-display-helper
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=DRM helpers for display adapters drivers
-  DEPENDS:=video-support +kmod-drm-kms-helper +LINUX_6_18:kmod-cec-core
+  DEPENDS:=video-support +kmod-drm-kms-helper +kmod-cec-core
   HIDDEN:=1
   KCONFIG:=CONFIG_DRM_DISPLAY_HELPER
   FILES:=$(LINUX_DIR)/drivers/gpu/drm/display/drm_display_helper.ko
@@ -469,8 +463,7 @@ define KernelPackage/drm-ttm-helper
   TITLE:=Helpers for ttm-based gem objects
   HIDDEN:=1
   DEPENDS:=video-support +kmod-drm-ttm +kmod-drm-kms-helper
-  KCONFIG:=CONFIG_DRM_TTM_HELPER \
-	   CONFIG_DRM_DISPLAY_HELPER_CEC=n
+  KCONFIG:=CONFIG_DRM_TTM_HELPER
   FILES:=$(LINUX_DIR)/drivers/gpu/drm/drm_ttm_helper.ko
   AUTOLOAD:=$(call AutoProbe,drm_ttm_helper)
 endef
@@ -759,10 +752,6 @@ define KernelPackage/drm-imx
   KCONFIG:=CONFIG_DRM_IMX \
 	CONFIG_IMX_IPUV3_CORE \
 	CONFIG_RESET_CONTROLLER=y \
-	CONFIG_DRM_IMX_IPUV3 \
-	CONFIG_IMX_IPUV3 \
-	CONFIG_DRM_GEM_CMA_HELPER=y \
-	CONFIG_DRM_KMS_CMA_HELPER=y \
 	CONFIG_DRM_IMX_PARALLEL_DISPLAY=n \
 	CONFIG_DRM_IMX_TVE=n \
 	CONFIG_DRM_IMX_LDB=n \
@@ -771,7 +760,7 @@ define KernelPackage/drm-imx
 	$(LINUX_DIR)/drivers/gpu/drm/imx/ipuv3/imxdrm.ko \
 	$(LINUX_DIR)/drivers/gpu/drm/drm_dma_helper.ko \
 	$(LINUX_DIR)/drivers/gpu/ipu-v3/imx-ipu-v3.ko
-  AUTOLOAD:=$(call AutoLoad,08,imxdrm imx-ipu-v3 imx-ipuv3-crtc)
+  AUTOLOAD:=$(call AutoLoad,08,imxdrm imx-ipu-v3)
 endef
 
 define KernelPackage/drm-imx/description
@@ -791,7 +780,7 @@ define KernelPackage/drm-imx-hdmi
 	$(LINUX_DIR)/drivers/gpu/drm/bridge/synopsys/dw-hdmi.ko \
 	$(LINUX_DIR)/drivers/gpu/drm/bridge/synopsys/dw-hdmi-ahb-audio.ko \
 	$(LINUX_DIR)/drivers/gpu/drm/imx/ipuv3/dw_hdmi-imx.ko
-  AUTOLOAD:=$(call AutoLoad,08,dw-hdmi dw-hdmi-ahb-audio.ko dw_hdmi-imx)
+  AUTOLOAD:=$(call AutoLoad,08,dw-hdmi dw-hdmi-ahb-audio dw_hdmi-imx)
 endef
 
 define KernelPackage/drm-imx-hdmi/description
@@ -804,18 +793,16 @@ $(eval $(call KernelPackage,drm-imx-hdmi))
 define KernelPackage/drm-imx-ldb
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=Freescale i.MX LVDS DRM support
-  DEPENDS:=@(TARGET_imx&&TARGET_imx_cortexa9) +kmod-backlight +kmod-drm-panel-simple kmod-drm-imx +LINUX_6_18:kmod-drm-display-helper
+  DEPENDS:=@(TARGET_imx&&TARGET_imx_cortexa9) +kmod-backlight +kmod-drm-panel-simple kmod-drm-imx +kmod-drm-display-helper
   KCONFIG:=CONFIG_DRM_IMX_LDB \
-	CONFIG_DRM_IMX_LEGACY_BRIDGE@ge6.18 \
+	CONFIG_DRM_IMX_LEGACY_BRIDGE \
 	CONFIG_DRM_PANEL_SAMSUNG_LD9040=n \
 	CONFIG_DRM_PANEL_SAMSUNG_S6E8AA0=n \
 	CONFIG_DRM_PANEL_LG_LG4573=n \
-	CONFIG_DRM_PANEL_LD9040=n \
 	CONFIG_DRM_PANEL_LVDS=n \
-	CONFIG_DRM_PANEL_S6E8AA0=n \
 	CONFIG_DRM_PANEL_SITRONIX_ST7789V=n
   FILES:= \
-	$(LINUX_DIR)/drivers/gpu/drm/bridge/imx/imx-legacy-bridge.ko@ge6.18 \
+	$(LINUX_DIR)/drivers/gpu/drm/bridge/imx/imx-legacy-bridge.ko \
 	$(LINUX_DIR)/drivers/gpu/drm/imx/ipuv3/imx-ldb.ko
   AUTOLOAD:=$(call AutoLoad,08,imx-ldb)
 endef
@@ -850,7 +837,7 @@ define KernelPackage/drm-panel-backlight-quirks
   KCONFIG:=CONFIG_DRM_PANEL_BACKLIGHT_QUIRKS
   DEPENDS:=+kmod-backlight
   FILES:=$(LINUX_DIR)/drivers/gpu/drm/drm_panel_backlight_quirks.ko
-  AUTOLOAD:=$(call AutoProbe,panel-backlight-quirks)
+  AUTOLOAD:=$(call AutoProbe,drm_panel_backlight_quirks)
 endef
 
 define KernelPackage/drm-panel-backlight-quirks/description
