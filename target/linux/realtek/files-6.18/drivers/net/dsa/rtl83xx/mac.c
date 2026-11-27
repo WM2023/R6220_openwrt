@@ -12,7 +12,7 @@
 #include <net/dsa.h>
 
 #include "mac.h"
-#include "rtl-otto.h"
+#include "otto_dsa.h"
 
 /* Both length fields are 14 bits wide (hardware maximum 16383 bytes). */
 #define RTLDSA_MAC_MAX_LEN_FIELD		GENMASK(13, 0)
@@ -390,12 +390,8 @@ static void otto_mac_83xx_phylink_config(struct phylink_config *config,
 	if (priv->family_id != RTL8380_FAMILY_ID)
 		return;
 
-	if (dsa_port_is_cpu(dp)) {
-		/* allow CRC errors on CPU-port */
-		regmap_update_bits(priv->map, priv->r->mac_port_ctrl(port),
-				   0x8, 0x8);
+	if (dsa_port_is_cpu(dp))
 		return;
-	}
 
 	regmap_read(priv->map, priv->r->mac_force_mode_ctrl(port), &mcr);
 	if (mode == MLO_AN_PHY || phylink_autoneg_inband(mode)) {
@@ -730,9 +726,9 @@ int otto_mac_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	if (priv->r->mac_max_len_reg) {
 		frame_size = new_mtu + RTLDSA_FRAME_OVERHEAD;
 
-		sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK,
-			    RTLDSA_MAC_MAX_LEN_VAL(frame_size),
-			    priv->r->mac_max_len_reg(port));
+		regmap_write_bits(priv->map, priv->r->mac_max_len_reg(port),
+				  RTLDSA_MAC_MAX_LEN_MASK,
+				  RTLDSA_MAC_MAX_LEN_VAL(frame_size));
 
 		return 0;
 	}
@@ -740,13 +736,13 @@ int otto_mac_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	/* One register for all ports, so it has to fit the largest of them */
 	frame_size = otto_mac_largest_mtu(ds, port, new_mtu) + RTLDSA_FRAME_OVERHEAD;
 
-	sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK, RTLDSA_MAC_MAX_LEN_VAL(frame_size),
-		    priv->r->mac_max_len_ctrl);
+	regmap_write_bits(priv->map, priv->r->mac_max_len_ctrl,
+			  RTLDSA_MAC_MAX_LEN_MASK, RTLDSA_MAC_MAX_LEN_VAL(frame_size));
 
 	if (priv->r->mac_max_len_ctrl_dup)
-		sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK,
-			    RTLDSA_MAC_MAX_LEN_VAL(frame_size),
-			    priv->r->mac_max_len_ctrl_dup);
+		regmap_write_bits(priv->map, priv->r->mac_max_len_ctrl_dup,
+				  RTLDSA_MAC_MAX_LEN_MASK,
+				  RTLDSA_MAC_MAX_LEN_VAL(frame_size));
 
 	return 0;
 }
